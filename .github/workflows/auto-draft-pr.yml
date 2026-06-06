@@ -1,0 +1,113 @@
+# Auto-open or update a draft PR when feature branches are pushed.
+
+name: Auto draft PR
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - staging
+      - master
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-draft-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create or update draft PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const base = 'main';
+            const head = context.ref.replace('refs/heads/', '');
+            if (head === base) return;
+
+            const prPolicyBlocked = (err) =>
+              err?.status === 403
+              && String(err?.message || '').includes(
+                'not permitted to create or approve pull requests',
+              );
+
+            const { owner, repo } = context.repo;
+            const { data: existing } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head: `${owner}:${head}`,
+              base,
+            });
+
+            const title = head
+              .replace(/\//g, ' ')
+              .replace(/-/g, ' ')
+              .replace(/\b\w/g, (c) => c.toUpperCase());
+
+            const body = [
+              '## Summary',
+              `Auto draft PR for branch \`${head}\` (push workflow).`,
+              '',
+              '## Test plan',
+              '- [ ] CI green',
+              '- [ ] Merge when ready (`./scripts/ship-pr.sh -m "…" -a --merge` or `--no-commit --merge`, or GitHub UI)',
+            ].join('\n');
+
+            if (existing.length > 0) {
+              const pr = existing[0];
+              try {
+                await github.rest.pulls.update({
+                  owner,
+                  repo,
+                  pull_number: pr.number,
+                  title,
+                  body,
+                  draft: true,
+                });
+                core.info(`Updated draft PR #${pr.number}: ${pr.html_url}`);
+              } catch (err) {
+                if (prPolicyBlocked(err)) {
+                  core.warning(
+                    `Cannot update PR via Actions (repo policy). Open PR #${pr.number} unchanged: ${pr.html_url}`,
+                  );
+                } else {
+                  throw err;
+                }
+              }
+              return;
+            }
+
+            const compare = await github.rest.repos.compareCommits({
+              owner,
+              repo,
+              base,
+              head,
+            });
+            if (compare.data.ahead_by === 0) {
+              core.info(`No commits between ${base} and ${head}; skipping PR create.`);
+              return;
+            }
+
+            try {
+              const { data: created } = await github.rest.pulls.create({
+                owner,
+                repo,
+                title,
+                head,
+                base,
+                body,
+                draft: true,
+              });
+              core.info(`Created draft PR #${created.number}: ${created.html_url}`);
+            } catch (err) {
+              if (prPolicyBlocked(err)) {
+                core.warning(
+                  'GitHub Actions cannot create PRs on this repo. Open one with ./scripts/ship-pr.sh or enable "Allow GitHub Actions to create and approve pull requests" under Settings → Actions → General.',
+                );
+                return;
+              }
+              throw err;
+            }
