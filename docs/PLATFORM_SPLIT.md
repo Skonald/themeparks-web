@@ -148,14 +148,14 @@ Required content:
 - Short “Why mobile?” bullets: saved trips, personalized itineraries, GPS replan, push alerts (future)
 - Optional `?park=` and `?date=` query params echoed in copy (“Continue planning for Magic Kingdom on June 12”)
 
-### Deep links (spec — implementation Phase 3)
+### Deep links (live)
 
 | Scheme | Example | Use |
 |--------|---------|-----|
 | Custom URL | `themeparky://plan?park=magic_kingdom&date=2026-06-12` | Post-install handoff from web calendar |
 | Universal link | `https://themeparky.com/plan?park=...` | iOS/Android; resolves to app or App Store |
 
-Web calendar and park CTAs should append `park` and `date` query params to `/download` so the download page can surface continuity copy. The mobile app reads the same params on first launch after install (deferred deep link).
+The `/download` page encodes `themeparky://plan?...` in a QR code when `?park=` / `?date=` are present. The Flutter app handles both schemes via `app_links` and opens the Plan tab → itinerary generation with prefilled park and date.
 
 ### No login on web
 
