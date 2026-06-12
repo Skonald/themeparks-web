@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Footer } from "@/components/Footer";
-import { TopNav } from "@/components/TopNav";
+import { NavShell } from "@/components/NavShell";
 import "./globals.css";
 
 const inter = Inter({
@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ThemeParks — Plan Smarter, Play Harder",
+  title: "Themeparky — Plan Smarter, Play Harder",
   description:
     "Live wait times, crowd forecasts, and park analytics. Plan your trip in the mobile app.",
 };
@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="flex min-h-screen flex-col font-sans">
-        <TopNav />
+        <NavShell />
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:py-10">
           {children}
         </main>

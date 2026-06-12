@@ -1,19 +1,19 @@
 import type { MetadataRoute } from "next";
-import { getParks } from "@/lib/api/parks";
+import { getAllParks } from "@/lib/api/parks";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://themeparky.com";
 
 const parkSubPaths = [
-  "",
-  "/waits",
-  "/calendar",
   "/trends",
-  "/events",
+  "/waits",
   "/lightning-lane",
+  "/characters",
+  "/events",
+  "/calendar",
 ] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const parks = await getParks();
+  const parks = await getAllParks();
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -37,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${siteUrl}/parks/${park.park_id}${sub}`,
       lastModified: now,
       changeFrequency: sub === "/waits" ? ("hourly" as const) : ("daily" as const),
-      priority: sub === "" ? 0.8 : 0.6,
+      priority: sub === "/trends" ? 0.8 : 0.6,
     })),
   );
 

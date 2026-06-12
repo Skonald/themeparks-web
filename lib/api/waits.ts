@@ -14,6 +14,15 @@ export async function getParkWaitTimes(
   }
 }
 
+/** Wait-time statuses that count as open for the "Open only" filter (allowlist). */
+const OPERATING_STATUSES = new Set(["operating", "operational", "open"]);
+
+/** True only for known operating statuses — unknown values stay hidden when filtering. */
+export function isAttractionOpen(status: string | null | undefined): boolean {
+  if (!status?.trim()) return false;
+  return OPERATING_STATUSES.has(status.toLowerCase().trim());
+}
+
 export function waitLevelLabel(minutes: number | null | undefined): string {
   if (minutes == null || minutes < 0) return "Unknown";
   if (minutes <= 20) return "Low";

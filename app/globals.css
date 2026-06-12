@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --brand-primary: 103 58 183;
+    --brand-primary: 30 136 229;
     --brand-accent: 68 138 255;
     --surface: 255 255 255;
     --surface-muted: 248 250 252;
@@ -41,7 +41,27 @@
   }
 
   .chip-inactive {
-    @apply bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50;
+    @apply border border-slate-200 bg-white text-slate-700 hover:bg-slate-50;
+  }
+
+  .chip-resort-active {
+    @apply border border-brand-primary/35 bg-brand-primary/10 font-semibold text-brand-primary;
+  }
+
+  .chip-resort-inactive {
+    @apply border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50;
+  }
+
+  .chip-tab {
+    @apply inline-flex shrink-0 items-center rounded-lg px-3 py-1.5 text-sm font-medium transition-colors;
+  }
+
+  .chip-tab-active {
+    @apply bg-white text-brand-primary shadow-sm;
+  }
+
+  .chip-tab-inactive {
+    @apply text-slate-600 hover:bg-white/60 hover:text-slate-900;
   }
 
   .input-field {
