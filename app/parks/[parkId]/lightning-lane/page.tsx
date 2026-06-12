@@ -2,9 +2,6 @@ import { notFound } from "next/navigation";
 import { DownloadCTA } from "@/components/DownloadCTA";
 import { ErrorState } from "@/components/ErrorState";
 import { LightningLaneClient } from "@/components/LightningLaneClient";
-import { ParkPageHeader } from "@/components/ParkPageHeader";
-import { ParkSubNav } from "@/components/ParkSubNav";
-import { StaleDataHint } from "@/components/StaleDataHint";
 import { getParkById } from "@/lib/api/parks";
 import { getParkWaitTimes } from "@/lib/api/waits";
 
@@ -22,16 +19,10 @@ export default async function LightningLanePage({
   const data = await getParkWaitTimes(parkId);
 
   return (
-    <div className="space-y-8">
-      <ParkPageHeader park={park} />
-      <div>
-        <h2 className="text-lg font-semibold text-slate-900">
-          Lightning Lane reference
-        </h2>
-        <StaleDataHint updatedAt={data?.updated_at} />
-      </div>
-
-      <ParkSubNav parkId={parkId} active="lightning-lane" />
+    <>
+      <h2 className="text-lg font-semibold text-slate-900">
+        Lightning Lane reference
+      </h2>
 
       {!data ? (
         <ErrorState message="Could not load Lightning Lane data." />
@@ -43,6 +34,6 @@ export default async function LightningLanePage({
         parkId={parkId}
         headline="Book and optimize Lightning Lane in the app"
       />
-    </div>
+    </>
   );
 }

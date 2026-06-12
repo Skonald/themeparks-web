@@ -15,7 +15,7 @@ export function Footer() {
                 width={28}
                 height={28}
               />
-              <span className="font-bold text-brand-primary">ThemeParks</span>
+              <span className="font-bold text-brand-primary">Themeparky</span>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-slate-600">
               Research waits, crowds, and trends on the web. Save trips and build
@@ -43,7 +43,7 @@ export function Footer() {
           </div>
         </div>
         <p className="mt-8 border-t border-slate-100 pt-6 text-center text-xs text-slate-400">
-          © {new Date().getFullYear()} ThemeParks · Plan smarter, play harder
+          © {new Date().getFullYear()} Themeparky · Plan smarter, play harder
         </p>
       </div>
     </footer>

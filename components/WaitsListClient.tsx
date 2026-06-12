@@ -1,8 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import {
+  LightningLanePassBadges,
+  llPassKinds,
+} from "@/components/LightningLanePassIcon";
 import type { AttractionWait } from "@/lib/api/types";
-import { waitLevelClass, waitLevelLabel } from "@/lib/api/waits";
+import {
+  isAttractionOpen,
+  waitLevelClass,
+  waitLevelLabel,
+} from "@/lib/api/waits";
 
 type SortKey = "wait-desc" | "wait-asc" | "name";
 
@@ -20,10 +28,10 @@ export function WaitsListClient({
     let list = [...attractions];
 
     if (openOnly) {
-      list = list.filter((a) => a.status?.toLowerCase() !== "closed");
+      list = list.filter((a) => isAttractionOpen(a.status));
     }
     if (llOnly) {
-      list = list.filter((a) => (a.access_features?.length ?? 0) > 0);
+      list = list.filter((a) => llPassKinds(a).length > 0);
     }
     if (query.trim()) {
       const q = query.toLowerCase();
@@ -122,12 +130,12 @@ export function WaitsListClient({
   );
 }
 
-function llSummary(a: AttractionWait): string {
-  const types = a.access_features
-    ?.map((f) => f.type)
-    .filter(Boolean) as string[] | undefined;
-  if (!types?.length) return "—";
-  return types.join(", ");
+function formatStatus(status: string | undefined): string {
+  if (!status) return "—";
+  return status
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function WaitRow({ attraction: a }: { attraction: AttractionWait }) {
@@ -137,7 +145,7 @@ function WaitRow({ attraction: a }: { attraction: AttractionWait }) {
       <td className="px-4 py-3 font-medium text-slate-900">
         {a.attraction_name}
       </td>
-      <td className="px-4 py-3 text-slate-600">{a.status ?? "—"}</td>
+      <td className="px-4 py-3 text-slate-600">{formatStatus(a.status)}</td>
       <td className="px-4 py-3">
         <span className={`font-semibold ${waitLevelClass(a.wait_time_minutes)}`}>
           {a.wait_time_minutes != null ? `${a.wait_time_minutes} min` : "—"}
@@ -146,14 +154,16 @@ function WaitRow({ attraction: a }: { attraction: AttractionWait }) {
           <span className="ml-2 text-xs text-slate-500">({label})</span>
         )}
       </td>
-      <td className="px-4 py-3 text-xs text-slate-600">{llSummary(a)}</td>
+      <td className="px-4 py-3">
+        <LightningLanePassBadges attraction={a} />
+      </td>
     </tr>
   );
 }
 
 function WaitCard({ attraction: a }: { attraction: AttractionWait }) {
   const label = waitLevelLabel(a.wait_time_minutes);
-  const ll = llSummary(a);
+  const hasLl = llPassKinds(a).length > 0;
   return (
     <div className="card p-4">
       <div className="flex items-start justify-between gap-3">
@@ -169,11 +179,11 @@ function WaitCard({ attraction: a }: { attraction: AttractionWait }) {
           )}
         </div>
       </div>
-      <p className="mt-1 text-xs text-slate-500">{a.status ?? "Unknown"}</p>
-      {ll !== "—" && (
-        <p className="mt-2 inline-flex rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
-          {ll}
-        </p>
+      <p className="mt-1 text-xs text-slate-500">{formatStatus(a.status)}</p>
+      {hasLl && (
+        <div className="mt-2">
+          <LightningLanePassBadges attraction={a} compact />
+        </div>
       )}
     </div>
   );

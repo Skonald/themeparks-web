@@ -1,11 +1,23 @@
+import Image from "next/image";
 import Link from "next/link";
 import { formatParkLocation } from "@/lib/api/parks";
 import type { Park } from "@/lib/api/types";
 import {
   getParkOperatorCategory,
+  getParkRouteId,
   operatorBadgeClass,
   operatorGradient,
 } from "@/lib/parkUtils";
+
+function parkSubtitle(park: Park): string {
+  const location = formatParkLocation(park);
+  if (location) return location;
+  if (park.operator) return park.operator;
+  if (park.timezone) {
+    return park.timezone.replace(/_/g, " ").replace(/\//g, ", ");
+  }
+  return getParkOperatorCategory(park);
+}
 
 export function ParkCard({
   park,
@@ -15,32 +27,45 @@ export function ParkCard({
   compact?: boolean;
 }) {
   const category = getParkOperatorCategory(park);
-  const location = formatParkLocation(park);
+  const subtitle = parkSubtitle(park);
+  const routeId = getParkRouteId(park);
 
   return (
     <Link
-      href={`/parks/${park.park_id}`}
-      className="card-interactive group flex flex-col overflow-hidden"
+      href={`/parks/${routeId}/trends`}
+      className="card-interactive group flex h-full flex-col overflow-hidden"
     >
       <div
-        className={`relative bg-gradient-to-br ${operatorGradient(park)} ${compact ? "h-20" : "h-28"} px-4 py-3`}
+        className={`relative overflow-hidden bg-gradient-to-br ${operatorGradient(park)} ${compact ? "px-3 py-2.5" : "px-4 py-3"}`}
       >
-        <span
-          className={`absolute right-3 top-3 rounded-full px-2 py-0.5 text-xs font-medium ${operatorBadgeClass(park)}`}
+        {park.image_url && (
+          <Image
+            src={park.image_url}
+            alt=""
+            fill
+            className="object-cover opacity-40"
+            sizes="(max-width: 768px) 100vw, 33vw"
+            unoptimized
+          />
+        )}
+        <h3
+          className={`relative line-clamp-2 font-bold leading-snug text-white drop-shadow-sm ${compact ? "text-base" : "text-base sm:text-lg"}`}
         >
-          {category}
-        </span>
-        <div className="flex h-full items-end">
-          <h3
-            className={`font-bold leading-tight text-white drop-shadow-sm ${compact ? "text-base" : "text-lg"}`}
-          >
-            {park.name}
-          </h3>
-        </div>
+          {park.name}
+        </h3>
       </div>
-      <div className={`${compact ? "p-3" : "p-4"}`}>
-        {location && <p className="text-sm text-slate-500">{location}</p>}
-        <p className="mt-2 text-xs font-medium text-brand-accent opacity-0 transition-opacity group-hover:opacity-100">
+      <div
+        className={`flex flex-1 flex-col ${compact ? "gap-1.5 p-3" : "gap-2 px-4 py-3"}`}
+      >
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-medium ${operatorBadgeClass(park)}`}
+          >
+            {category}
+          </span>
+          <p className="text-sm text-slate-500">{subtitle}</p>
+        </div>
+        <p className="mt-auto text-xs font-medium text-brand-accent group-hover:underline">
           View waits &amp; forecasts →
         </p>
       </div>

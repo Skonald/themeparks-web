@@ -1,9 +1,6 @@
 import { notFound } from "next/navigation";
 import { DownloadCTA } from "@/components/DownloadCTA";
 import { ErrorState } from "@/components/ErrorState";
-import { ParkPageHeader } from "@/components/ParkPageHeader";
-import { ParkSubNav } from "@/components/ParkSubNav";
-import { StaleDataHint } from "@/components/StaleDataHint";
 import { WaitsListClient } from "@/components/WaitsListClient";
 import { getParkById } from "@/lib/api/parks";
 import { getParkWaitTimes } from "@/lib/api/waits";
@@ -25,14 +22,8 @@ export default async function ParkWaitsPage({
   );
 
   return (
-    <div className="space-y-8">
-      <ParkPageHeader park={park} />
-      <div>
-        <h2 className="text-lg font-semibold text-slate-900">Live wait times</h2>
-        <StaleDataHint updatedAt={data?.updated_at} />
-      </div>
-
-      <ParkSubNav parkId={parkId} active="waits" />
+    <>
+      <h2 className="text-lg font-semibold text-slate-900">Live wait times</h2>
 
       {!data ? (
         <ErrorState message="Could not load wait times for this park." />
@@ -45,6 +36,6 @@ export default async function ParkWaitsPage({
       )}
 
       <DownloadCTA parkId={parkId} headline="Get live replans in the park" />
-    </div>
+    </>
   );
 }

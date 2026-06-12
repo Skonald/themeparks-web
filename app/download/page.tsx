@@ -1,32 +1,17 @@
-import Image from "next/image";
 import Link from "next/link";
 import QRCode from "qrcode";
+import { AppStoreBadges } from "@/components/hero/AppStoreBadges";
+import { HeroPrimaryCta } from "@/components/hero/HeroPrimaryCta";
+import { HeroProofChips } from "@/components/hero/HeroProofChips";
+import { PhoneMockup } from "@/components/hero/PhoneMockup";
 import { getParkById } from "@/lib/api/parks";
 import { buildPlanDeepLink } from "@/lib/deepLink";
 import { formatDisplayDate } from "@/lib/formatUtils";
+import { HERO_COPY, WHY_MOBILE } from "@/lib/heroContent";
 
 interface Props {
   searchParams: Promise<{ park?: string; date?: string }>;
 }
-
-const WHY_MOBILE = [
-  {
-    title: "Saved trips",
-    body: "Pick up planning where you left off — across devices.",
-  },
-  {
-    title: "Personalized itineraries",
-    body: "Preferences, heights, Lightning Lane, and breaks baked in.",
-  },
-  {
-    title: "Live replan",
-    body: "GPS-aware adjustments when waits change in the park.",
-  },
-  {
-    title: "Push alerts",
-    body: "Trip reminders and replan nudges (coming soon).",
-  },
-] as const;
 
 const WHY_WEB = [
   "Live wait times",
@@ -47,38 +32,43 @@ export default async function DownloadPage({ searchParams }: Props) {
   const qrDataUrl = await QRCode.toDataURL(deepLink, {
     margin: 2,
     width: 220,
-    color: { dark: "#4A148C", light: "#FFFFFF" },
+    color: { dark: "#1E88E5", light: "#FFFFFF" },
   });
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-brand-primary via-violet-700 to-indigo-900 px-6 py-10 text-center text-white sm:px-12">
-        <Image
-          src="/themeparky_logo.png"
-          alt="ThemeParks"
-          width={88}
-          height={88}
-          className="mx-auto drop-shadow-lg"
-        />
-        <h1 className="mt-6 text-3xl font-bold tracking-tight">
-          Plan your perfect park day
-        </h1>
-        <p className="mx-auto mt-3 max-w-md text-violet-100">
-          Research on the web. Optimize your day in the app.
-        </p>
+    <div className="mx-auto max-w-4xl">
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-primary via-blue-700 to-blue-900 px-6 py-12 text-white shadow-card sm:px-10 sm:py-14">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+        <div className="relative flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-lg text-center lg:text-left">
+            <p className="text-sm font-semibold uppercase tracking-wider text-blue-200">
+              {HERO_COPY.eyebrow}
+            </p>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+              {HERO_COPY.headline}
+            </h1>
+            <p className="mt-4 text-blue-100">{HERO_COPY.subline}</p>
+            <HeroProofChips theme="dark" className="mt-6 justify-center lg:justify-start" />
+            <div className="mt-8 flex justify-center lg:justify-start">
+              <HeroPrimaryCta label={HERO_COPY.ctaPrimary} variant="white" />
+            </div>
+            <AppStoreBadges theme="light" className="mt-5 justify-center lg:justify-start" />
 
-        {parkName && (
-          <div className="mx-auto mt-6 max-w-md rounded-2xl bg-white/15 px-5 py-4 backdrop-blur-sm">
-            <p className="text-sm text-violet-100">Continue planning for</p>
-            <p className="text-lg font-semibold">{parkName}</p>
-            {date && (
-              <p className="mt-1 text-sm text-violet-200">
-                {formatDisplayDate(date)}
-              </p>
+            {parkName && (
+              <div className="mx-auto mt-6 max-w-md rounded-2xl bg-white/15 px-5 py-4 backdrop-blur-sm lg:mx-0">
+                <p className="text-sm text-blue-100">Continue planning for</p>
+                <p className="text-lg font-semibold">{parkName}</p>
+                {date && (
+                  <p className="mt-1 text-sm text-blue-200">
+                    {formatDisplayDate(date)}
+                  </p>
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
+          <PhoneMockup size="sm" className="hidden shrink-0 sm:block" />
+        </div>
+      </section>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-2">
         <div className="card flex flex-col items-center p-8 text-center">
@@ -89,7 +79,7 @@ export default async function DownloadPage({ searchParams }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={qrDataUrl}
-            alt="QR code for ThemeParks app"
+            alt="QR code for Themeparky app"
             width={220}
             height={220}
             className="mt-6 rounded-2xl border border-slate-200 shadow-card"
@@ -100,14 +90,7 @@ export default async function DownloadPage({ searchParams }: Props) {
         <div className="space-y-6">
           <div>
             <h2 className="font-semibold text-slate-900">Get the app</h2>
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-              <span className="inline-flex flex-1 items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white">
-                App Store — coming soon
-              </span>
-              <span className="inline-flex flex-1 items-center justify-center rounded-xl bg-brand-accent px-5 py-3 text-sm font-semibold text-white">
-                Google Play — coming soon
-              </span>
-            </div>
+            <AppStoreBadges theme="dark" className="mt-4" />
           </div>
 
           <div>
@@ -132,7 +115,7 @@ export default async function DownloadPage({ searchParams }: Props) {
       <div className="card mt-8 p-6">
         <h2 className="font-semibold text-slate-900">What you can do on the web</h2>
         <p className="mt-2 text-sm text-slate-600">
-          Use ThemeParks in the browser to research before you install — no login
+          Use Themeparky in the browser to research before you install — no login
           required.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">

@@ -1,17 +1,17 @@
 import { ErrorState } from "@/components/ErrorState";
 import { ParksBrowseClient } from "@/components/ParksBrowseClient";
-import { getParks } from "@/lib/api/parks";
+import { getAllParks } from "@/lib/api/parks";
 
 export const revalidate = 3600;
 
 export const metadata = {
-  title: "Browse Theme Parks — ThemeParks",
+  title: "Browse Theme Parks — Themeparky",
   description:
     "Explore theme parks worldwide. Live waits, crowd forecasts, and events.",
 };
 
 export default async function BrowseParksPage() {
-  const parks = await getParks(200);
+  const parks = await getAllParks();
 
   return (
     <div className="space-y-8">
